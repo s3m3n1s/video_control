@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Game</title>
+    <script src="{{ url_for('static', filename='js/nipplejs.min.js') }}"></script>    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+        }
+
+        #joystick-container {
+            position: fixed;
+            right: 10%;
+            bottom: 20%;
+            transform: translate(50%, 50%);
+            z-index: 999;
+        }
+
+        #shootButton {
+            position: fixed;
+            left: 10px;
+            bottom: 10px;
+            padding: 10px;
+            background-color: rgba(255, 0, 0, 0.5);
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Your existing handles go here -->
+
+    <!-- Joystick Container -->
+    <div id="joystick-container"></div>
+
+    <!-- Shoot Button -->
+    <button id="shootButton">Стрелять!</button>
+
+    <!-- Your existing game content goes here -->
+
+    <script>
+        // Add your existing JavaScript code here
+
+        // Set up nipplejs joystick
+        const joystickContainer = document.getElementById('joystick-container');
+        const joystickOptions = {
+            zone: joystickContainer,
+            color: 'blue',
+            mode: 'static',
+            position: { right: '50%', bottom: '50%' },
+            size: Math.min(window.innerWidth, window.innerHeight) * 0.2,
+        };
+        const joystick = nipplejs.create(joystickOptions);
+
+        // Set up shoot button
+        const shootButton = document.getElementById('shootButton');
+        let pressTimer;
+        let intervalId;
+
+        shootButton.addEventListener('touchstart', () => {
+            pressTimer = 0; // Reset the press timer
+            intervalId = setInterval(() => {
+                pressTimer += 50;
+                // Send command to /send_command with the press time
+                console.log(`Sending command with press time: ${pressTimer}ms`);
+            }, 50);
+        });
+
+        shootButton.addEventListener('touchend', () => {
+            // Clear the timer and interval on button release
+            clearInterval(intervalId);
+            console.log('Touch ended');
+        });
+
+        // Add event listeners for joystick and shoot button actions
+        joystick.on('move', (evt, data) => {
+            // Handle joystick movement
+            console.log('Joystick Move', data);
+        });
+
+        document.getElementById('shootButton').addEventListener('click', () => {
+            // Handle shoot button click
+            console.log('Shoot Button Clicked');
+        });
+    </script>
+</body>
+</html>

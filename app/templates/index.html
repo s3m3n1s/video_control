@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Control</title>
+    
+    <script src="{{ url_for('static', filename='js/nipplejs.min.js') }}"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+        }
+
+        #joystick-container {
+            position: fixed;
+            right: 10%;
+            bottom: 20%;
+            transform: translate(50%, 50%);
+            z-index: 999;
+        }
+
+        #action-button {
+            position: fixed;
+            left: 10px;
+            bottom: 10px;
+            padding: 10px;
+            background-color: rgba(255, 0, 0, 0.5);
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="joystick-container"></div>
+
+    <img src="{{ url_for('video_feed') }}" id="video-feed">
+
+
+    <button id="action-button">Стрелять!</button>
+
+    <!-- Звук выстрела -->
+    <audio id="gunshot-audio" src="{{ url_for('static', filename='music/gunshot.mp3') }}"></audio>
+
+<!--    <script>-->
+<!--        document.addEventListener('DOMContentLoaded', function () {-->
+<!--            // Настройка джойстика-->
+<!--            var joystickContainer = document.getElementById('joystick-container');-->
+<!--            var joystick = nipplejs.create({-->
+<!--                zone: joystickContainer,-->
+<!--                mode: 'static',-->
+<!--                position: { left: '50%', top: '50%' },-->
+<!--                color: 'red',-->
+<!--                lockX: true,-->
+<!--                lockY: true-->
+<!--            });-->
+
+<!--            // Отправка команд по изменению положения джойстика-->
+<!--            joystick.on('start move', function (evt, data) {-->
+<!--                var relativeX = data.position.x;-->
+<!--                var relativeY = data.position.y;-->
+
+<!--                // Рассчет угла и длины вектора-->
+<!--                var angle = Math.atan2(relativeY, relativeX) * (180 / Math.PI);-->
+<!--                var length = Math.sqrt(relativeX * relativeX + relativeY * relativeY);-->
+
+<!--                // Пример отправки данных через AJAX (замените на свой код)-->
+<!--                var xhr = new XMLHttpRequest();-->
+<!--                xhr.open('POST', '/send_command', true);-->
+<!--                xhr.setRequestHeader('Content-Type', 'application/json');-->
+<!--                xhr.send(JSON.stringify({ angle: angle, length: length }));-->
+<!--            });-->
+
+<!--            // Обработка нажатия на кнопку действия-->
+<!--            var actionButton = document.getElementById('action-button');-->
+<!--            actionButton.addEventListener('click', function () {-->
+<!--                // Воспроизведение звука выстрела-->
+<!--                var gunshotAudio = document.getElementById('gunshot-audio');-->
+<!--                gunshotAudio.play();-->
+<!--                var xhr = new XMLHttpRequest();-->
+<!--                xhr.open('POST', '/send_command', true);-->
+<!--                xhr.setRequestHeader('Content-Type', 'application/json');-->
+<!--                xhr.send(JSON.stringify({ shot: "started" }));-->
+<!--            });-->
+
+<!--            var buttonPressStartTime;-->
+<!--            var pressIntervalId;-->
+
+<!--            actionButton.addEventListener('touchstart', function () {-->
+<!--                buttonPressStartTime = new Date().getTime();-->
+<!--                var xhr = new XMLHttpRequest();-->
+
+<!--                // Запускаем интервал для регулярной обработки каждые 50 миллисекунд-->
+<!--                pressIntervalId = setInterval(function () {-->
+<!--                    var buttonPressEndTime = new Date().getTime();-->
+<!--                    var pressDuration = buttonPressEndTime - buttonPressStartTime;-->
+
+<!--                    xhr.open('POST', '/send_command', true);-->
+<!--                    xhr.setRequestHeader('Content-Type', 'application/json');-->
+<!--                    xhr.send(JSON.stringify({ shot: "continued", shotTime: pressDuration }));-->
+
+<!--                    console.log('Button held for ' + pressDuration + ' milliseconds');-->
+<!--                }, 50);-->
+<!--            });-->
+
+<!--            actionButton.addEventListener('touchend', function () {-->
+<!--                // Очищаем интервал при отпускании кнопки-->
+<!--                clearInterval(pressIntervalId);-->
+
+<!--                // Пример: код, который выполняется при отпускании кнопки-->
+<!--                console.log('Button released');-->
+<!--            });-->
+<!--        });-->
+<!--    </script>-->
+
+    <script>
+        const joystickContainer = document.getElementById('joystick-container');
+        const joystickOptions = {
+            zone: joystickContainer,
+            color: 'blue',
+            mode: 'static',
+            position: { right: '50%', bottom: '50%' },
+            size: Math.min(window.innerWidth, window.innerHeight) * 0.2,
+        };
+        const joystick = nipplejs.create(joystickOptions);
+
+        joystick.on('move', function (evt, data) {
+                var relativeX = data.position.x;
+                var relativeY = data.position.y;
+
+                // Рассчет угла и длины вектора
+                var angle = Math.atan2(relativeY, relativeX) * (180 / Math.PI);
+                var length = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
+
+                // Пример отправки данных через AJAX (замените на свой код)
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/send_command', true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.send(JSON.stringify({ angle: angle, length: length }));
+            });
+
+
+        const shootButton = document.getElementById('action-button');
+        let pressTimer;
+        let intervalId;
+
+        shootButton.addEventListener('pointerdown', () => {
+            pressTimer = 0; // Reset the press timer
+            intervalId = setInterval(() => {
+                pressTimer += 50;
+                // Send command to /send_command with the press time
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/send_command', true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.send(JSON.stringify({ shot: "continued", shotTime: pressTimer }));
+            }, 50);
+
+        });
+
+        shootButton.addEventListener('pointerup', () => {
+            // Clear the timer and interval on button release
+            clearInterval(intervalId);
+            console.log('Touch ended');
+        });
+        document.getElementById('action-button').addEventListener('click', () => {
+            var gunshotAudio = document.getElementById('gunshot-audio');
+            gunshotAudio.play();
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/send_command', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify({ shot: "started" }));
+        });
+    </script>
+</body>
+</html>
