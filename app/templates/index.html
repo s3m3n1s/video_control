@@ -130,20 +130,31 @@
         };
         const joystick = nipplejs.create(joystickOptions);
 
-        joystick.on('move', function (evt, data) {
-                var relativeX = data.position.x;
-                var relativeY = data.position.y;
+    joystick.on('move', function (evt, data) {
+        var angle = data.angle.degree;
 
-                // Рассчет угла и длины вектора
-                var angle = Math.atan2(relativeY, relativeX) * (180 / Math.PI);
-                var length = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
+        // Преобразование отрицательных углов к положительным
+        if (angle < 0) {
+            angle = 360 + angle;
+        }
 
-                // Пример отправки данных через AJAX (замените на свой код)
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', '/send_command', true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
-                xhr.send(JSON.stringify({ angle: angle, length: length }));
-            });
+        // Преобразование угла в соотношение сторон
+        var levelRight  = Math.max(0, Math.cos(angle * Math.PI / 180));
+        var levelLeft  = Math.max(0, -Math.cos(angle * Math.PI / 180));
+        var levelUp = Math.max(0, Math.sin(angle * Math.PI / 180));
+        var levelDown = Math.max(0, -Math.sin(angle * Math.PI / 180));
+
+        // Пример отправки данных через AJAX (замените на свой код)
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/send_command', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({
+            up: levelUp,
+            right: levelRight,
+            down: levelDown,
+            left: levelLeft
+        }));
+    });
 
 
         const shootButton = document.getElementById('action-button');
