@@ -12,21 +12,29 @@ def send_command():
     data = request.get_json()
     if 'down' in data:
         try:
-            publish.single(mqtt_topic+"/horizontal", payload=str(data['right'] if data['right'] else data['left']),
-                           hostname=mqtt_broker_host, port=mqtt_broker_port)
-            publish.single(mqtt_topic+"/vertical", payload=str(data['up'] if data['up'] else data['down']),
-                           hostname=mqtt_broker_host, port=mqtt_broker_port)
+            if data['right']:
+                publish.single(mqtt_topic + "/horizontal/right", payload=str(data['right']),
+                               hostname=mqtt_broker_host, port=mqtt_broker_port)
+            if data['left']:
+                publish.single(mqtt_topic + "/horizontal/left", payload=str(data['left']),
+                               hostname=mqtt_broker_host, port=mqtt_broker_port)
+            if data['up']:
+                publish.single(mqtt_topic + "/vertical/up", payload=str(data['up']),
+                               hostname=mqtt_broker_host, port=mqtt_broker_port)
+            if data['down']:
+                publish.single(mqtt_topic + "/vertical/down", payload=str(data['down']),
+                               hostname=mqtt_broker_host, port=mqtt_broker_port)
+
             return jsonify({"status": "success"})
         except Exception as e:
             return jsonify({"status": "error", "message": str(e)})
     elif 'shot' in data:
         try:
-            publish.single(mqtt_topic+"/fire", payload=str(data['shot']),
+            publish.single(mqtt_topic + "/fire", payload=str(data['shot']),
                            hostname=mqtt_broker_host, port=mqtt_broker_port)
             return jsonify({"status": "success"})
         except Exception as e:
             return jsonify({"status": "error", "message": str(e)})
-
 
 
 if __name__ == '__main__':
