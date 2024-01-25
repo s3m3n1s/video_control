@@ -7,6 +7,8 @@ mqtt_broker_port = 1883
 mqtt_topic = "turel/contol"
 
 mqtt_client = client.Client()
+mqtt_client.loop_start()
+
 mqtt_client.connect(mqtt_broker_host, mqtt_broker_port, 60)
 
 
