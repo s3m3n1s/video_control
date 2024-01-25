@@ -40,7 +40,7 @@
 <body>
     <div id="joystick-container"></div>
 
-    <img src="{{ url_for('video_feed') }}" id="video-feed">
+    <img src="{{ url_for('video_feed') }}" id="video-feed" style="max-width: 100%; max-height: 100%; vertical-align: middle; margin: 0 auto;">
 
 
     <button id="action-button">Огонь!</button>
@@ -164,13 +164,13 @@
         shootButton.addEventListener('pointerdown', () => {
             pressTimer = 0; // Reset the press timer
             intervalId = setInterval(() => {
-                pressTimer += 500;
+                pressTimer += 250;
                 // Send command to /send_command with the press time
                 var xhr = new XMLHttpRequest();
                 xhr.open('POST', '/send_command', true);
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 xhr.send(JSON.stringify({ shot: "continued", shotTime: pressTimer }));
-            }, 500);
+            }, 250);
 
         });
 
