@@ -23,9 +23,9 @@ def send_command():
             if data['left']:
                 mqtt_send(mqtt_topic + "/horizontal/left", payload=str(data['left']))
             if data['up']:
-                publish.single(mqtt_topic + "/vertical/up", payload=str(data['up']))
+                mqtt_send(mqtt_topic + "/vertical/up", payload=str(data['up']))
             if data['down']:
-                publish.single(mqtt_topic + "/vertical/down", payload=str(data['down']))
+                mqtt_send(mqtt_topic + "/vertical/down", payload=str(data['down']))
 
             return jsonify({"status": "success"})
         except Exception as e:
