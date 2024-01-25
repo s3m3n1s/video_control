@@ -32,7 +32,7 @@ def send_command():
             return jsonify({"status": "error", "message": str(e)})
     elif 'shot' in data:
         try:
-            publish.single(mqtt_topic + "/fire", payload=str(data['shot']),
+            mqtt_send(mqtt_topic + "/fire", payload=str(data['shot']),
                            hostname=mqtt_broker_host, port=mqtt_broker_port)
             return jsonify({"status": "success"})
         except Exception as e:
