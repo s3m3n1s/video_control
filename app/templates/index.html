@@ -164,13 +164,13 @@
         shootButton.addEventListener('pointerdown', () => {
             pressTimer = 0; // Reset the press timer
             intervalId = setInterval(() => {
-                pressTimer += 250;
+                pressTimer += 500;
                 // Send command to /send_command with the press time
                 var xhr = new XMLHttpRequest();
                 xhr.open('POST', '/send_command', true);
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 xhr.send(JSON.stringify({ shot: "continued", shotTime: pressTimer }));
-            }, 250);
+            }, 500);
 
         });
 
