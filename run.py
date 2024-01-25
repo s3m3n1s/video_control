@@ -26,14 +26,16 @@ def send_command():
 
             return jsonify({"status": "success"})
         except Exception as e:
-            mqtt_client.connect(mqtt_broker_host, mqtt_broker_port, 60)
+            mqtt_client.reconnect()
+            # mqtt_client.connect(mqtt_broker_host, mqtt_broker_port, 60)
             return jsonify({"status": "error", "message": str(e)})
     elif 'shot' in data:
         try:
             mqtt_client.publish(mqtt_topic + "/fire", payload=str(data['shot']))
             return jsonify({"status": "success"})
         except Exception as e:
-            mqtt_client.connect(mqtt_broker_host, mqtt_broker_port, 60)
+            mqtt_client.reconnect()
+            # mqtt_client.connect(mqtt_broker_host, mqtt_broker_port, 60)
             return jsonify({"status": "error", "message": str(e)})
 
 
