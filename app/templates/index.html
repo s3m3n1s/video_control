@@ -43,7 +43,7 @@
     <img src="{{ url_for('video_feed') }}" id="video-feed">
 
 
-    <button id="action-button">Стрелять!</button>
+    <button id="action-button">Огонь!</button>
 
     <!-- Звук выстрела -->
     <audio id="gunshot-audio" src="{{ url_for('static', filename='music/gunshot.mp3') }}"></audio>
@@ -164,13 +164,13 @@
         shootButton.addEventListener('pointerdown', () => {
             pressTimer = 0; // Reset the press timer
             intervalId = setInterval(() => {
-                pressTimer += 50;
+                pressTimer += 250;
                 // Send command to /send_command with the press time
                 var xhr = new XMLHttpRequest();
                 xhr.open('POST', '/send_command', true);
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 xhr.send(JSON.stringify({ shot: "continued", shotTime: pressTimer }));
-            }, 50);
+            }, 250);
 
         });
 
